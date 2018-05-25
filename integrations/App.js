@@ -5,37 +5,65 @@
  */
 
 import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+export default class App extends Component {
+  componentWillMount() {
+    GoogleSignin.configure({
+      iosClientId: '700137076210-sd8tvj8bku7r1vdkanu1426v3dbhfptv.apps.googleusercontent.com'
+    })
+  } 
+  
+  componentWillUnmount() {
+    // this._clickListener && this._clickListener.remove();
+    if(Platform.OS === "ios"){
 
-type Props = {};
-export default class App extends Component<Props> {
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
+        <TouchableOpacity style={styles.buttonStyle} onPress={() => this.handleSigninGoogle()}>
+          <Text style ={styles.textButtonStyle}>Sign in with Google +</Text>
+        </TouchableOpacity>
       </View>
     );
   }
+
+  handleSigninGoogle() {
+    GoogleSignin.signIn().then((user) => {
+      console.log(user);
+      alert(user.name);
+    }).catch((err) => {
+      console.log('WRONG SIGNIN', err);
+    }).done();
+  }
+
+  currentUserAsync() {
+    return new Promise((resolve, reject) => {
+      const sucessCb = NativeAppEventEmitter.addListener('RNGoogleSignInSuccess', (user) => {
+        this._user = {
+          ...user,
+        };
+        this._removeListeners(sucessCb, errorCb);
+        resolve(user);
+      });
+
+      const errorCb = NativeAppEventEmitter.addListener('RNGoogleSignInError', () => {
+        this._removeListeners(sucessCb, errorCb);
+        resolve(null);
+      });
+
+      RNGoogleSignin.currentUserAsync();
+    });
+  }
+
+  currentUser() {
+    return {...this._user};
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -45,14 +73,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  buttonStyle: {
+    padding: 8,
+    paddingLeft: 15,
+    paddingRight: 15,
+    backgroundColor: '#F00',
+    borderRadius: 5
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  textButtonStyle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFF'
+  }
 });

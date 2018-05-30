@@ -8,5 +8,7 @@ use_frameworks!
 
 target 'integrations' do
 
+pod 'FBSDKLoginKit'
+pod 'FBSDKShareKit'
 pod 'GoogleSignIn'
 end

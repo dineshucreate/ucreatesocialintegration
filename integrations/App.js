@@ -16,10 +16,7 @@ export default class App extends Component {
   } 
   
   componentWillUnmount() {
-    // this._clickListener && this._clickListener.remove();
-    if(Platform.OS === "ios"){
-
-    }
+    this._clickListener && this._clickListener.remove();
   }
 
   render() {
